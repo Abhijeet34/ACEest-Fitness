@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aceest-fitness"
+version = "1.0.0"
+description = "ACEest Fitness & Gym Management API"
+readme = "README.md"
+authors = [
+    {name = "ACEest DevOps Team", email = "devops@aceest.com"}
+]
+license = {text = "Proprietary"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: Flask",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "Flask==3.0.0",
+    "gunicorn==21.2.0",
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==8.0.0",
+    "flake8==7.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["aceest*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,4 +1,4 @@
-from app.data import programs
+from aceest.data import programs
 
 # --- Programs ---
 

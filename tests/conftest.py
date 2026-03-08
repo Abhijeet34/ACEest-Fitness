@@ -1,8 +1,8 @@
 import os
 import tempfile
 import pytest
-from app import create_app
-from app.db import init_db
+from aceest import create_app
+from aceest.db import init_db
 
 @pytest.fixture
 def client():
