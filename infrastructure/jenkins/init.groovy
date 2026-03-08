@@ -24,11 +24,12 @@ if (hudsonRealm.getUser("admin") == null) {
     println "Admin user created and security configured."
 }
 
-// Set Jenkins Location URL
+// Set Jenkins Location URL and Admin Address
 def jlc = JenkinsLocationConfiguration.get()
 jlc.setUrl("http://localhost:8080/")
+jlc.setAdminAddress("admin@aceest.com")
 jlc.save()
-println "Jenkins Location URL set to http://localhost:8080/"
+println "Jenkins Location URL set to http://localhost:8080/ and Admin Email set to admin@aceest.com"
 
 // Define the job name
 def jobName = "ACEest-CI"
