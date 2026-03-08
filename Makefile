@@ -38,6 +38,8 @@ destroy: clean app-down infra-down
 nuke: clean
 	docker compose down -v --rmi local
 	cd infrastructure/jenkins && docker compose down -v --rmi local
+	# Remove manually built images (from Jenkins builds or manual docker build)
+	@docker images --format '{{.Repository}}:{{.Tag}}' | grep 'aceest-fitness' | xargs -r docker rmi -f
 	rm -rf infrastructure/jenkins/jenkins_home
 	@echo "Environment completely obliterated (volumes, data, and local images removed)"
 

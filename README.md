@@ -8,7 +8,7 @@ graph TD
 
     GitHub -->|Trigger| Actions[GitHub Actions CI/CD]
     Actions --> Install[Install Dependencies]
-    Actions --> Lint[Lint (flake8)]
+    Actions --> Lint["Lint (flake8)"]
     Actions --> Build[Build Docker Image]
     Actions --> Test[Run Pytest in Docker]
     Actions --> Push[Push to GHCR]
@@ -57,14 +57,18 @@ graph TD
 
 1. **Install Dependencies:**
    ```bash
-   python -m venv .venv && source .venv/bin/activate
+   python3 -m venv .venv && source .venv/bin/activate
    make install
    ```
+   > **Note:** Use `python3` explicitly. On macOS, `python` may point to Python 2 or be unavailable.
 
 2. **Run Application:**
    ```bash
-   python run.py
+   python3 run.py
    ```
+   The application will be available at `http://localhost:5002`.
+   > **macOS Note:** Port `5000` is reserved by AirPlay Receiver. This project uses port `5002` for local development to avoid conflicts.
+
    **API Endpoints:**
    - `GET /` - API Index
    - `GET /programs` - List fitness programs
@@ -114,22 +118,29 @@ We have containerized the entire Jenkins environment with **Infrastructure as Co
    make infra-down
    ```
 
-## 5. Cleanup
+## 5. Cleanup & Fresh Start
 
-We provide Make commands to manage the lifecycle of the environment.
+We provide Make commands to manage the full lifecycle of the environment.
 
-### Stop and Clean (Preserve Data)
-To stop all running services (App & Jenkins) and remove containers, while **preserving** database and Jenkins build history:
+### Stop Services (Preserve Data)
+Stops all containers (App + Jenkins) while keeping build history, volumes, and Docker images intact:
 ```bash
 make destroy
 ```
 
 ### Full Reset (Factory Reset)
-To **completely wipe** the entire environment, including all volumes, databases, and Jenkins configuration/history. Use this to start fresh.
+Completely wipes everything: containers, Docker images built by this project, all volumes, and Jenkins data.
+Use this when you want a completely fresh start, as if cloning the repo for the first time.
 ```bash
 make nuke
 ```
-*Warning: This action is irreversible.*
+After this, restart the full project with:
+```bash
+make install        # Install Python deps and set up git hooks
+make infra-up       # Build and start Jenkins (wait ~30s)
+make deploy         # Build and run the application
+```
+*Warning: This action is irreversible. All build history and data will be lost.*
 
 ## 6. GitHub Actions
 
@@ -138,6 +149,3 @@ The `.github/workflows/main.yml` pipeline ensures code quality on every push to 
 - **Testing**: Runs `pytest` suite.
 - **Build**: Verifies Docker build integrity.
 - **Publish**: Simulates push to GitHub Container Registry.
-# Dummy change
-# Test Hook
-# Retry Hook

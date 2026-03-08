@@ -17,8 +17,8 @@ JOB_NAME="ACEest-CI"
 USER="admin"
 PASS="admin"
 
-# Check if Jenkins is reachable
-if curl --output /dev/null --silent --head --fail "$JENKINS_URL"; then
+# Check if Jenkins is reachable (allow 403 which means it's up but secured)
+if curl --output /dev/null --silent --head --write-out "%{http_code}" "$JENKINS_URL" | grep -qE "200|403"; then
     echo "[CI] Triggering Jenkins build..."
     
     # Get Crumb (CSRF Protection)

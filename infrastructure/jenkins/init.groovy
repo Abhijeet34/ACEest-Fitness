@@ -6,6 +6,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
 import hudson.plugins.git.GitSCM
 import hudson.plugins.git.UserRemoteConfig
 import hudson.plugins.git.BranchSpec
+import hudson.triggers.SCMTrigger
 
 // Get the Jenkins instance
 def instance = Jenkins.getInstance()
@@ -61,6 +62,9 @@ flowDefinition.setLightweight(true) // Lightweight checkout
 
 // Set the flow definition for the job
 job.setDefinition(flowDefinition)
+
+// Add SCM Polling Trigger (every minute) to simulate webhook behavior locally
+job.addTrigger(new SCMTrigger("* * * * *"))
 
 // Save the job configuration
 job.save()
