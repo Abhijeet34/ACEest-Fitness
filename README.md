@@ -28,7 +28,8 @@ Developer Machine
 |-- app/
 |   |-- __init__.py   # Application factory (create_app)
 |   |-- routes.py     # Flask Blueprint with API routes
-|   |-- data.py       # Fitness program data
+|   |-- data.py       # Fitness program data (static plans)
+|   |-- db.py         # SQLite initialization and connection helpers
 |-- tests/
 |   |-- test_app.py   # Pytest test suite
 |-- jenkins/
@@ -60,9 +61,12 @@ python run.py
 ```
 
 **API Endpoints:**
-- `GET /` - Welcome message
-- `GET /programs` - List all programs
-- `GET /programs/<name>` - Get program details (supports fuzzy name match)
+- `GET /` - Welcome message and endpoint index
+- `GET /programs` - List all available fitness programs
+- `GET /programs/<name>` - Get workout and diet details (fuzzy name match supported)
+- `GET /clients` - List all registered clients
+- `POST /clients` - Register a new client (JSON body: `name`, `age`, `height`, `weight`, `program`)
+- `POST /workouts` - Log a workout (JSON body: `client_name`, `date`, `workout_type`, `duration_min`, `notes`)
 
 ## 2. Running Tests
 
@@ -70,7 +74,7 @@ python run.py
 python -m pytest
 ```
 
-Expected output: `5 passed`
+Expected output: `11 passed`
 
 ## 3. Docker Deployment
 
