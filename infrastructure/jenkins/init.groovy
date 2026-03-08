@@ -24,6 +24,12 @@ if (hudsonRealm.getUser("admin") == null) {
     println "Admin user created and security configured."
 }
 
+// Set Jenkins Location URL
+def jlc = JenkinsLocationConfiguration.get()
+jlc.setUrl("http://localhost:8080/")
+jlc.save()
+println "Jenkins Location URL set to http://localhost:8080/"
+
 // Define the job name
 def jobName = "ACEest-CI"
 
