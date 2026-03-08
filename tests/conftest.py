@@ -4,6 +4,7 @@ import pytest
 from aceest import create_app
 from aceest.db import init_db
 
+
 @pytest.fixture
 def client():
     db_fd, db_path = tempfile.mkstemp()

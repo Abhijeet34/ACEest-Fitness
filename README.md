@@ -4,49 +4,57 @@
 
 ```
 Developer Machine
-  |- Git Push --------> GitHub Repo
-                            |
-                            |--> GitHub Actions (CI/CD)
-                            |       |- Install Dependencies
-                            |       |- Lint (flake8)
-                            |       |- Build Docker Image
-                            |       |- Run Pytest inside Docker
-                            |       |- Push to GHCR
-                            |
-                            |--> Jenkins (Build Gate)
-                                    |- Checkout SCM
-                                    |- Install Dependencies
-                                    |- Lint
-                                    |- Build Docker
-                                    |- Test in Docker
+│
+└── Git Push ────────────────► GitHub Repository
+                                │
+                                ├── GitHub Actions (CI/CD)
+                                │   ├── Install Dependencies
+                                │   ├── Lint (flake8)
+                                │   ├── Build Docker Image
+                                │   ├── Run Pytest inside Docker
+                                │   └── Push Image to GHCR
+                                │
+                                └── Jenkins (Build Gate)
+                                    ├── Checkout SCM
+                                    ├── Install Dependencies
+                                    ├── Lint
+                                    ├── Build Docker
+                                    └── Test in Docker
 ```
 
 ## Project Structure
 
 ```
 .
-|-- src/
-|   |-- aceest/
-|       |-- __init__.py   # Application factory (create_app)
-|       |-- routes.py     # Flask Blueprint with API routes
-|       |-- data.py       # Fitness program data (static plans)
-|       |-- db.py         # SQLite initialization and connection helpers
-|-- scripts/
-|   |-- deploy.sh     # Deployment automation script
-|-- infrastructure/
-|   |-- jenkins/      # Local Jenkins server configuration
-|-- docs/
-|   |-- reports/      # Test reports
-|-- tests/            # Pytest suite
-|-- .github/workflows/# GitHub Actions CI/CD
-|-- config.py         # Application configuration
-|-- docker-compose.yml# Main application deployment
-|-- Dockerfile        # Production Docker image
-|-- Jenkinsfile       # CI/CD Pipeline definition
-|-- Makefile          # Developer commands
-|-- pyproject.toml    # Python project configuration
-|-- run.py            # Local development entry point
-|-- requirements.txt  # Dependencies (legacy/docker)
+├── src/
+│   └── aceest/
+│       ├── __init__.py        # Application factory (create_app)
+│       ├── routes.py          # Flask Blueprint with API routes
+│       ├── data.py            # Fitness program data (static plans)
+│       └── db.py              # SQLite initialization and connection helpers
+│
+├── scripts/
+│   └── deploy.sh              # Deployment automation script
+│
+├── infrastructure/
+│   └── jenkins/               # Local Jenkins server configuration
+│
+├── docs/
+│   └── reports/               # Test reports
+│
+├── tests/                     # Pytest suite
+│
+├── .github/
+│   └── workflows/             # GitHub Actions CI/CD
+│
+├── config.py                  # Application configuration
+├── docker-compose.yml         # Main application deployment
+├── Dockerfile                 # Production Docker image
+├── Jenkinsfile                # CI/CD Pipeline definition
+├── Makefile                   # Developer commands
+├── pyproject.toml             # Python project configuration
+├── run.py                     # Local development entry point
+└── requirements.txt           # Dependencies (legacy/docker)
 ```
 
 ## Prerequisites
@@ -69,7 +77,7 @@ Developer Machine
    ```bash
    python run.py
    ```
-   
+
    **API Endpoints:**
    - `GET /` - Welcome message
    - `GET /programs` - List programs

@@ -30,9 +30,9 @@ def create_app(test_config=None):
 
     db.init_app(app)
     app.register_blueprint(bp)
-    
-    # Auto-init DB for convenience (optional but good for assignment)
+
+    # Auto-initialize DB tables on startup
     with app.app_context():
         db.init_db()
-        
+
     return app

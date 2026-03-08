@@ -1,3 +1,4 @@
+# flake8: noqa: E501
 programs = {
     "Fat Loss (FL)": {
         "workout": "Mon: 5x5 Back Squat + AMRAP\nTue: EMOM 20min Assault Bike\nWed: Bench Press + 21-15-9\nThu: 10RFT Deadlifts/Box Jumps\nFri: 30min Active Recovery",
