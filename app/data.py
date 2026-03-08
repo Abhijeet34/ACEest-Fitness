@@ -1,7 +1,3 @@
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
 programs = {
     "Fat Loss (FL)": {
         "workout": "Mon: 5x5 Back Squat + AMRAP\nTue: EMOM 20min Assault Bike\nWed: Bench Press + 21-15-9\nThu: 10RFT Deadlifts/Box Jumps\nFri: 30min Active Recovery",
@@ -16,25 +12,3 @@ programs = {
         "diet": "Balanced Tamil Meals: Idli-Sambar, Rice-Dal, Chapati.\nProtein: 120g/day",
     }
 }
-
-@app.route("/")
-def home():
-    return jsonify({"message": "Welcome to ACEest Fitness API", "endpoints": ["/programs", "/programs/<name>"]})
-
-@app.route("/programs")
-def get_programs():
-    return jsonify(list(programs.keys()))
-
-@app.route("/programs/<name>")
-def get_program(name):
-    if name in programs:
-        return jsonify(programs[name])
-    
-    for key in programs:
-        if name.lower() in key.lower():
-            return jsonify(programs[key])
-            
-    return jsonify({"error": "Program not found"}), 404
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)

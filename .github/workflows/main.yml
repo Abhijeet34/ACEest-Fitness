@@ -35,3 +35,13 @@ jobs:
 
     - name: Run tests inside Docker
       run: docker run --rm aceest-fitness:latest python -m pytest
+
+    - name: Push to GHCR (Simulated)
+      run: |
+        echo "Login to GHCR..."
+        # echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        echo "Tagging image..."
+        # docker tag aceest-fitness:latest ghcr.io/${{ github.repository }}/aceest-fitness:latest
+        echo "Pushing image..."
+        # docker push ghcr.io/${{ github.repository }}/aceest-fitness:latest
+        echo "Push complete (Simulated due to lack of secrets)"

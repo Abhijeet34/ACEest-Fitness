@@ -1,0 +1,11 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+# Install Docker CLI
+RUN apt-get update && apt-get install -y docker.io python3 python3-pip
+
+# Install Python dependencies globally for Jenkins job runs
+RUN pip3 install flask pytest flake8 --break-system-packages
+
+USER jenkins

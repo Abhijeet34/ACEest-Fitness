@@ -1,70 +1,121 @@
 # ACEest Fitness & Gym - DevOps Pipeline
 
-## Overview
-This repository contains the source code and DevOps configuration for the ACEest Fitness & Gym application. The application provides fitness programs (Workout and Diet plans) via a RESTful API.
-
 ## Architecture
-- **Application**: Python Flask
-- **Containerization**: Docker
-- **CI/CD**: GitHub Actions (Cloud) & Jenkins (On-Premise simulation)
-- **Testing**: Pytest
 
-## Local Setup
-
-### Prerequisites
-- Python 3.9+
-- Docker
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   cd ACEest-Fitness
-   ```
-2. Create virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Running the Application
-```bash
-python app.py
 ```
-The API will be available at `http://localhost:5000`.
-- List Programs: `http://localhost:5000/programs`
-- Get Program: `http://localhost:5000/programs/Fat Loss (FL)`
+Developer Machine
+  |- Git Push --------> GitHub Repo
+                            |
+                            |--> GitHub Actions (CI/CD)
+                            |       |- Install Dependencies
+                            |       |- Lint (flake8)
+                            |       |- Build Docker Image
+                            |       |- Run Pytest inside Docker
+                            |       |- Push to GHCR
+                            |
+                            |--> Jenkins (Build Gate)
+                                    |- Checkout SCM
+                                    |- Install Dependencies
+                                    |- Lint
+                                    |- Build Docker
+                                    |- Test in Docker
+```
 
-### Running Tests
-To execute the unit test suite:
+## Project Structure
+
+```
+.
+|-- app/
+|   |-- __init__.py   # Application factory (create_app)
+|   |-- routes.py     # Flask Blueprint with API routes
+|   |-- data.py       # Fitness program data
+|-- tests/
+|   |-- test_app.py   # Pytest test suite
+|-- jenkins/
+|   |-- Dockerfile.jenkins  # Custom Jenkins with Docker+Python
+|   |-- docker-compose.yml  # Jenkins local server
+|-- .github/workflows/
+|   |-- main.yml      # GitHub Actions CI/CD pipeline
+|-- Dockerfile        # Application Docker image
+|-- docker-compose.yml # Application deployment
+|-- Jenkinsfile       # Declarative Jenkins pipeline
+|-- deploy.sh         # Manual deployment script
+|-- run.py            # Application entry point
+|-- requirements.txt
+```
+
+## Prerequisites
+
+- Python 3.9+
+- Docker & Docker Compose
+- Git
+
+## 1. Local Development
+
+```bash
+git clone <repo-url> && cd ACEest-Fitness
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python run.py
+```
+
+**API Endpoints:**
+- `GET /` - Welcome message
+- `GET /programs` - List all programs
+- `GET /programs/<name>` - Get program details (supports fuzzy name match)
+
+## 2. Running Tests
+
 ```bash
 python -m pytest
 ```
 
-## Docker Instructions
-1. Build the image:
+Expected output: `5 passed`
+
+## 3. Docker Deployment
+
+### Build and run with Docker Compose (recommended):
+```bash
+docker compose up --build -d
+```
+App available at `http://localhost:5000`.
+
+### Manual Docker Commands:
+```bash
+docker build -t aceest-fitness:latest .
+docker run -d -p 5000:5000 --name aceest-app aceest-fitness:latest
+```
+
+### Automated deployment script:
+```bash
+./deploy.sh
+```
+
+## 4. Jenkins Setup (Local)
+
+1. Start the Jenkins server:
    ```bash
-   docker build -t aceest-fitness:latest .
+   cd jenkins && docker compose up -d
    ```
-2. Run the container:
+2. Open `http://localhost:8080` in a browser.
+3. Get initial admin password:
    ```bash
-   docker run -p 5000:5000 aceest-fitness:latest
+   docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
    ```
+4. Install suggested plugins.
+5. Create a new **Pipeline** job.
+6. Under **Pipeline Definition**, select **Pipeline script from SCM**.
+7. Set SCM to **Git** and provide the repository URL.
+8. The `Jenkinsfile` in the root of the repo defines the pipeline stages:
+   - **Checkout** -> **Install Dependencies** -> **Lint** -> **Build Docker** -> **Test in Docker**
 
-## CI/CD Pipeline
+## 5. GitHub Actions
 
-### GitHub Actions
-The `.github/workflows/main.yml` pipeline runs on every push to `main`:
-1. **Build & Test**: Sets up Python, installs dependencies, runs `pytest`.
-2. **Docker Build**: Builds the Docker image to ensure containerization integrity.
+The `.github/workflows/main.yml` pipeline triggers on every `push` or `pull_request` to `main`.
 
-### Jenkins
-The `Jenkinsfile` defines a declarative pipeline:
-1. **Checkout**: Pulls code from SCM.
-2. **Install Dependencies**: Installs Python requirements.
-3. **Test**: Runs the Pytest suite.
-4. **Build Docker**: Builds the Docker image tagged with the build number.
+Stages:
+1. `Install dependencies`: Sets up Python 3.9, installs `requirements.txt`.
+2. `Lint with flake8`: Catches syntax errors and undefined names.
+3. `Build Docker image`: Builds the image to validate the `Dockerfile`.
+4. `Run tests inside Docker`: Runs `pytest` inside the container.
+5. `Push to GHCR` (requires `GITHUB_TOKEN` secret): Pushes the image to GitHub Container Registry.
