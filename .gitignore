@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .DS_Store
+infrastructure/jenkins/jenkins_home
+instance/
+*.sqlite
+.DS_Store
