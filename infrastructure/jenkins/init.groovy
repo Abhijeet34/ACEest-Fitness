@@ -1,5 +1,6 @@
 import jenkins.model.*
 import hudson.model.*
+import hudson.security.*
 import org.jenkinsci.plugins.workflow.job.WorkflowJob
 import org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
 import hudson.plugins.git.GitSCM
@@ -8,6 +9,20 @@ import hudson.plugins.git.BranchSpec
 
 // Get the Jenkins instance
 def instance = Jenkins.getInstance()
+
+// Create Admin User if not exists
+def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+if (hudsonRealm.getUser("admin") == null) {
+    hudsonRealm.createAccount("admin", "admin")
+    instance.setSecurityRealm(hudsonRealm)
+    
+    // Set Authorization Strategy to Full Control for logged in users
+    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+    strategy.setAllowAnonymousRead(false)
+    instance.setAuthorizationStrategy(strategy)
+    instance.save()
+    println "Admin user created and security configured."
+}
 
 // Define the job name
 def jobName = "ACEest-CI"
