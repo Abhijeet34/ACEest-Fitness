@@ -15,6 +15,12 @@ build:
 deploy:
 	./scripts/deploy.sh
 
+infra-up:
+	cd infrastructure/jenkins && docker compose up -d
+
+infra-down:
+	cd infrastructure/jenkins && docker compose down
+
 clean:
 	rm -rf .pytest_cache
 	rm -rf .coverage

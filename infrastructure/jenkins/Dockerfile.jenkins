@@ -8,4 +8,7 @@ RUN apt-get update && apt-get install -y docker.io python3 python3-pip
 # Install Python dependencies globally for Jenkins job runs
 RUN pip3 install flask pytest flake8 --break-system-packages
 
+# Copy init script to auto-configure job
+COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/init.groovy
+
 USER jenkins

@@ -32,5 +32,15 @@ pipeline {
                 sh 'docker run --rm aceest-fitness:${BUILD_NUMBER} python -m pytest'
             }
         }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    sh "docker stop aceest-app || true"
+                    sh "docker rm aceest-app || true"
+                    sh "docker run -d -p 5001:5000 --name aceest-app --restart always aceest-fitness:${BUILD_NUMBER}"
+                }
+            }
+        }
     }
 }
