@@ -5,15 +5,19 @@ from . import db
 
 
 def create_app(test_config=None):
-    app = Flask(__name__)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'aceest_fitness.sqlite'),
-    )
+    app = Flask(__name__, instance_relative_config=True)
 
     if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        # Load configuration from config.py (if available) or defaults
+        try:
+            from config import Config
+            app.config.from_object(Config)
+        except ImportError:
+            # Fallback defaults
+            app.config.from_mapping(
+                SECRET_KEY='dev',
+                DATABASE=os.path.join(app.instance_path, 'aceest_fitness.sqlite'),
+            )
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)

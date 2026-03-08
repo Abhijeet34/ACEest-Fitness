@@ -82,18 +82,19 @@ Expected output: `11 passed`
 ```bash
 docker compose up --build -d
 ```
-App available at `http://localhost:5000`.
+App available at `http://localhost:5001`.
 
 ### Manual Docker Commands:
 ```bash
 docker build -t aceest-fitness:latest .
-docker run -d -p 5000:5000 --name aceest-app aceest-fitness:latest
+docker run -d -p 5001:5000 --name aceest-app aceest-fitness:latest
 ```
 
 ### Automated deployment script:
 ```bash
 ./deploy.sh
 ```
+App will be running on port 5001.
 
 ## 4. Jenkins Setup (Local)
 

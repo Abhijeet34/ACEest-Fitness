@@ -2,7 +2,13 @@ services:
   aceest-app:
     build: .
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
-      - FLASK_ENV=development
+      - SECRET_KEY=change-in-production
     restart: always
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
