@@ -30,8 +30,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "docker stop aceest-app || true"
-                    sh "docker rm aceest-app || true"
+                    // Stop any existing containers using port 5001 or named aceest-app
+                    sh "docker rm -f aceest-app || true"
+                    sh "docker rm -f aceest-fitness-aceest-app-1 || true"
+                    
+                    // Deploy new container
                     sh "docker run -d -p 5001:5000 --name aceest-app --restart always aceest-fitness:${BUILD_NUMBER}"
                 }
             }
