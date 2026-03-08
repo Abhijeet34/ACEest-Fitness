@@ -2,142 +2,140 @@
 
 ## Architecture
 
-```
-Developer Machine
-│
-└── Git Push ────────────────► GitHub Repository
-                                │
-                                ├── GitHub Actions (CI/CD)
-                                │   ├── Install Dependencies
-                                │   ├── Lint (flake8)
-                                │   ├── Build Docker Image
-                                │   ├── Run Pytest inside Docker
-                                │   └── Push Image to GHCR
-                                │
-                                └── Jenkins (Build Gate)
-                                    ├── Checkout SCM
-                                    ├── Install Dependencies
-                                    ├── Lint
-                                    ├── Build Docker
-                                    └── Test in Docker
+```mermaid
+graph TD
+    User[Developer Machine] -->|Git Push| GitHub[GitHub Repository]
+
+    GitHub -->|Trigger| Actions[GitHub Actions CI/CD]
+    Actions --> Install[Install Dependencies]
+    Actions --> Lint[Lint (flake8)]
+    Actions --> Build[Build Docker Image]
+    Actions --> Test[Run Pytest in Docker]
+    Actions --> Push[Push to GHCR]
+
+    GitHub -->|Trigger| Jenkins[Jenkins Build Gate]
+    Jenkins --> J_Checkout[Checkout SCM]
+    Jenkins --> J_Install[Install Dependencies]
+    Jenkins --> J_Lint[Lint]
+    Jenkins --> J_Build[Build Docker]
+    Jenkins --> J_Test[Test in Docker]
+    Jenkins --> J_Deploy[Deploy Container]
 ```
 
 ## Project Structure
 
-```
+```text
 .
 ├── src/
 │   └── aceest/
-│       ├── __init__.py        # Application factory (create_app)
-│       ├── routes.py          # Flask Blueprint with API routes
-│       ├── data.py            # Fitness program data (static plans)
-│       └── db.py              # SQLite initialization and connection helpers
-│
-├── scripts/
-│   └── deploy.sh              # Deployment automation script
-│
+│       ├── __init__.py        # Application factory
+│       ├── routes.py          # Flask Blueprint & API routes
+│       ├── data.py            # Static fitness program data
+│       └── db.py              # Database connection manager
 ├── infrastructure/
-│   └── jenkins/               # Local Jenkins server configuration
-│
-├── docs/
-│   └── reports/               # Test reports
-│
+│   └── jenkins/               # Jenkins container configuration (IaC)
+├── scripts/
+│   └── deploy.sh              # Deployment automation
 ├── tests/                     # Pytest suite
-│
-├── .github/
-│   └── workflows/             # GitHub Actions CI/CD
-│
-├── config.py                  # Application configuration
-├── docker-compose.yml         # Main application deployment
-├── Dockerfile                 # Production Docker image
-├── Jenkinsfile                # CI/CD Pipeline definition
-├── Makefile                   # Developer commands
-├── pyproject.toml             # Python project configuration
-├── run.py                     # Local development entry point
-└── requirements.txt           # Dependencies (legacy/docker)
+├── .github/workflows/         # GitHub Actions CI/CD
+├── docker-compose.yml         # Application deployment orchestration
+├── Dockerfile                 # Production Docker image definition
+├── Jenkinsfile                # Jenkins Pipeline definition
+├── Makefile                   # Unified command runner
+├── pyproject.toml             # Python dependencies & build config
+└── run.py                     # Local development entry point
 ```
 
 ## Prerequisites
 
-- Python 3.9+
-- Docker & Docker Compose
-- Git
-- Make (optional but recommended)
+- **Python 3.9+**
+- **Docker & Docker Compose**
+- **Git**
+- **Make**
 
-## 1. Local Development (Standard Workflow)
+## 1. Local Development
 
 1. **Install Dependencies:**
    ```bash
    python -m venv .venv && source .venv/bin/activate
    make install
    ```
-   This installs the project in editable mode (`pip install -e .`).
 
 2. **Run Application:**
    ```bash
    python run.py
    ```
-
    **API Endpoints:**
-   - `GET /` - Welcome message
-   - `GET /programs` - List programs
-   - `GET /clients` - List clients
-   - `POST /clients` - Add client
-   - `POST /workouts` - Add workout
+   - `GET /` - API Index
+   - `GET /programs` - List fitness programs
+   - `GET /clients` - List registered clients
+   - `POST /clients` - Register new client
+   - `POST /workouts` - Log workout session
 
 3. **Run Tests:**
    ```bash
    make test
    ```
-   or `pytest` directly.
 
 ## 2. Docker Deployment
 
-### Using Make (Recommended)
+To build and deploy the application locally using Docker:
+
 ```bash
 make build
 make deploy
 ```
+The application will be available at `http://localhost:5001`.
 
-### Using Docker Compose Directly
-```bash
-docker compose up --build -d
-```
-App available at `http://localhost:5001`.
+## 3. Jenkins CI/CD (Automated Infrastructure)
 
-## 3. Jenkins CI/CD Setup
-
-To fulfill the requirement for a Jenkins build server, we have containerized the entire Jenkins environment. This ensures a consistent, reproducible build server setup without polluting your local machine.
+We have containerized the entire Jenkins environment with **Infrastructure as Code (IaC)** principles.
+**Crucial:** The Jenkins setup wizard is **disabled**, and an admin user is **auto-provisioned**.
 
 1. **Start Jenkins:**
    ```bash
-   cd infrastructure/jenkins
-   docker compose up -d
+   make infra-up
    ```
-2. **Access Jenkins:**
+   *Wait ~30 seconds for initialization.*
+
+2. **Access Dashboard:**
    Open `http://localhost:8080`.
-3. **Unlock Jenkins:**
-   Get the initial admin password:
+   - **Username:** `admin`  *(Auto-configured)*
+   - **Password:** `admin`  *(Auto-configured)*
+
+3. **Run Pipeline (Automated):**
+   - The project uses **Git Hooks** to simulate webhooks locally.
+   - Whenever you commit code (`git commit`), the Jenkins pipeline is automatically triggered.
+   - You can also manually trigger it by clicking **Build Now** in the Jenkins dashboard.
+   - The pipeline will Checkout, Test, Build, and **Deploy** the app to port `5001`.
+
+4. **Stop Jenkins:**
    ```bash
-   docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+   make infra-down
    ```
-4. **Create Pipeline:**
-   - New Item -> Pipeline -> Name: `ACEest-CI`
-   - Definition: `Pipeline script from SCM`
-   - SCM: `Git` -> Repository URL: `file:///absolute/path/to/ACEest-Fitness` (or your GitHub URL)
-   - Script Path: `Jenkinsfile`
-5. **Run Build:**
-   Click "Build Now". The pipeline will:
-   - Checkout code
-   - Install dependencies
-   - Lint code
-   - Build Docker image
-   - Run tests inside the container
 
-## 4. GitHub Actions
+## 5. Cleanup
 
-The `.github/workflows/main.yml` file defines the CI pipeline for GitHub. It runs on every push to `main` and performs:
-- Linting (flake8)
-- Unit Testing
-- Docker Build
-- Image Push (to GHCR)
+We provide Make commands to manage the lifecycle of the environment.
+
+### Stop and Clean (Preserve Data)
+To stop all running services (App & Jenkins) and remove containers, while **preserving** database and Jenkins build history:
+```bash
+make destroy
+```
+
+### Full Reset (Factory Reset)
+To **completely wipe** the entire environment, including all volumes, databases, and Jenkins configuration/history. Use this to start fresh.
+```bash
+make nuke
+```
+*Warning: This action is irreversible.*
+
+## 6. GitHub Actions
+
+The `.github/workflows/main.yml` pipeline ensures code quality on every push to `main`:
+- **Linting**: Enforces `flake8` standards.
+- **Testing**: Runs `pytest` suite.
+- **Build**: Verifies Docker build integrity.
+- **Publish**: Simulates push to GitHub Container Registry.
+# Dummy change
