@@ -7,3 +7,6 @@ infrastructure/jenkins/jenkins_home
 instance/
 *.sqlite
 .DS_Store
+cookie.jar
+cookies.txt
+crumb.txt
