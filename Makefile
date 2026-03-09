@@ -31,6 +31,8 @@ infra-down:
 
 app-down:
 	docker compose down
+	@docker stop aceest-app 2>/dev/null || true
+	@docker rm aceest-app 2>/dev/null || true
 
 destroy: clean app-down infra-down
 	@echo "Environment stopped and containers removed (data preserved in volumes)"

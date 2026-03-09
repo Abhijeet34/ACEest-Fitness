@@ -5,7 +5,9 @@ from . import db
 
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    # Set instance path to project root 'instance' folder, not inside src
+    instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'instance'))
+    app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
 
     if test_config is None:
         # Load configuration from config.py (if available) or defaults

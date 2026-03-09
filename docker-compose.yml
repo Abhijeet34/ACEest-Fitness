@@ -6,7 +6,7 @@ services:
     environment:
       - SECRET_KEY=change-in-production
       - TZ=Asia/Kolkata
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
       interval: 30s

@@ -16,4 +16,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../../:/var/repo
     container_name: jenkins
-    restart: always
+    restart: unless-stopped
